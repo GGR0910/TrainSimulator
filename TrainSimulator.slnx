@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Conductor/Conductor.csproj" Id="bf7e8b0d-5e70-4813-b658-fe56fcb4acb0" />
+  <Project Path="SimulationHub/SimulationHub.csproj" Id="9191bd46-7a87-42be-8dc8-f3117a9031a5" />
+  <Project Path="Train/Train.csproj" Id="0cfb00f9-f743-4e4f-9c6f-74059c213dbe" />
+</Solution>

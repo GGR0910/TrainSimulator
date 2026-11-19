@@ -31,22 +31,34 @@ connection.On<int>("GetNextStationPath", async trainId =>
 
 connection.On<int>("CheckIsStationFreeToArrive", async trainId =>
 {
-    bool isFree = MapTracker.IsStationFreeToArrive(trainId);
-    Console.WriteLine($"[CONDUCTOR] Verificando se a estação está livre para o trem {trainId}. Retorno: {isFree}");
+    var (isFree, shouldStop) = MapTracker.IsStationFreeToArrive(trainId);
+    Console.WriteLine($"[CONDUCTOR] Estação para Trem {trainId}: Livre={isFree} | Parar={shouldStop}");
 
-    await connection.SendAsync("IsStationFreeToArrive", trainId, isFree);
+    await connection.SendAsync("IsStationFreeToArrive", trainId, isFree, shouldStop);
 });
 
-connection.On<int, int>("DepartFromStation", (trainId, pathId) =>
+connection.On<int, int>("DepartFromStation", async (trainId, pathId) =>
 {
-    MapTracker.DepartFromStation(trainId, pathId);
+    var handoff = MapTracker.DepartFromStation(trainId, pathId);
     Console.WriteLine($"[CONDUCTOR] Trem {trainId} partiu pelo caminho {pathId}.");
+
+    if (handoff.HasValue)
+    {
+        Console.WriteLine($"[CONDUCTOR] FILA: Liberando estação para Trem {handoff.Value.TrainId} (Parar={handoff.Value.ShouldStop})!");
+        await connection.SendAsync("IsStationFreeToArrive", handoff.Value.TrainId, true, handoff.Value.ShouldStop);
+    }
 });
 
-connection.On<int, int>("ArriveAtStation", (trainId, pathId) =>
+connection.On<int, int>("ArriveAtStation", async (trainId, pathId) =>
 {
-    MapTracker.ArriveAtStation(trainId, pathId);
+    int? nextTrainId = MapTracker.ArriveAtStation(trainId, pathId);
     Console.WriteLine($"[CONDUCTOR] Trem {trainId} chegou à estação e liberou o caminho {pathId}.");
+
+    if (nextTrainId.HasValue)
+    {
+        Console.WriteLine($"[CONDUCTOR] FILA: Liberando caminho {pathId} para o Trem {nextTrainId.Value}!");
+        await connection.SendAsync("NextStationPath", nextTrainId.Value, pathId, true);
+    }
 });
 #endregion
 

@@ -27,6 +27,11 @@ namespace SimulationHub
             await Clients.Others.SendAsync("ArriveAtStation", trainId, pathId);
         }
 
+        public async Task CheckIsStationFreeToArrive(int trainId)
+        {
+            await Clients.Others.SendAsync("CheckIsStationFreeToArrive", trainId);
+        }
+
         // ==========================================
         // Conductor → Hub → Trem
         // ==========================================
@@ -40,9 +45,10 @@ namespace SimulationHub
             await Clients.Others.SendAsync("NextStationPath", trainId, nextPathId, freeToExecute);
         }
 
-        public async Task IsStationFreeToArrive(int trainId, bool isFree)
+        public async Task IsStationFreeToArrive(int trainId, bool isFree, bool shouldStop)
         {
-            await Clients.Others.SendAsync("IsStationFreeToArrive", trainId, isFree);
+            await Clients.Others.SendAsync("IsStationFreeToArrive", trainId, isFree, shouldStop);
         }
+
     }
 }

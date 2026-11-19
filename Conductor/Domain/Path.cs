@@ -8,6 +8,7 @@
         public bool IsOcupied { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsFree => !IsOcupied && !IsBlocked;
+        public Queue<int> WaitingTrains { get; }
 
         public Path(int id, int sourcePlataformId, int destinationPlataformId, bool isOcupied, bool isBlocked)
         {
@@ -16,6 +17,7 @@
             DestinationPlataformId = destinationPlataformId;
             IsOcupied = isOcupied;
             IsBlocked = isBlocked;
+            WaitingTrains = new Queue<int>();
         }
     }
 }
